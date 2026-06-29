@@ -246,8 +246,9 @@ function buildSvgImage(cb) {
   const svgWidth  = svg.getBoundingClientRect().width  || svg.viewBox.baseVal.width  || 800;
   const svgHeight = svg.getBoundingClientRect().height || svg.viewBox.baseVal.height || 600;
 
-  clone.setAttribute('width',  svgWidth);
-  clone.setAttribute('height', svgHeight);
+  clone.setAttribute('width',  svgWidth  + 100);
+  clone.setAttribute('height', svgHeight + 100);
+  clone.style.padding = '50px'; // you might not need this
 
   const xml  = new XMLSerializer().serializeToString(clone);
   const blob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
@@ -256,8 +257,8 @@ function buildSvgImage(cb) {
 
   img.onload = function() {
     svgImg = img;
-    svgImg._w = svgWidth;
-    svgImg._h = svgHeight;
+    svgImg._w = svgWidth+100;
+    svgImg._h = svgHeight+100;
     URL.revokeObjectURL(url);
     if (cb) cb();
   };
