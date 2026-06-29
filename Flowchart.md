@@ -16,7 +16,7 @@ CONFIG:
 ```
 
 MERMAID SCRIPT:
-```
+```mermaid
 flowchart TD
     DAILY["Daily trigger\n8am"] --> SORT["runInboxSorting()"]
     TENDAY["Daily trigger 7am\nfires every 10 days"] --> GATEWAY["dustbusterMasterGateway()"]
