@@ -50,7 +50,7 @@
   }
 
   #diagram-inner {
-    padding: 2rem;
+    padding: 3rem 4rem; // this is where you edit padding for the border of the flowchart
   }
 
   #diagram-inner svg {
@@ -273,8 +273,8 @@ function drawLens() {
 
   const lx      = mouseX - HALF;
   const ly      = mouseY - HALF;
-  lens.style.left = lx + 'px';
-  lens.style.top  = ly + 'px';
+  lens.style.left = (mouseX - HALF) + 'px';
+  lens.style.top  = (mouseY - HALF) + 'px';
 
   const srcX    = (mouseX - (iRect.left - wRect.left)) - HALF / scale;
   const srcY    = (mouseY - (iRect.top  - wRect.top))  - HALF / scale;
