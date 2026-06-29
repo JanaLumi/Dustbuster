@@ -8,4 +8,4 @@ Dustbuster config link to copy to your google drive: [Googlesheets link](https:/
 <svg src="flowchart.svg" alt="image describing the architecture" width="500"/>
 
 
-<a href="https://janalumi.github.io/dustbuster/dustbuster-flowchart.html">OPEN</a>
+<a href="https://janalumi.github.io/Dustbuster/dustbuster-flowchart.html">OPEN</a>
