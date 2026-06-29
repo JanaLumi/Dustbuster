@@ -1,6 +1,7 @@
 You can use this [live editor](https://mermaid.ai/live/) to display the diagram. Copy-Paste the content below in the appropriate fields.
 
 CONFIG:
+```
 {
   "theme": "forest",
   "look": "neo",
@@ -12,8 +13,10 @@ CONFIG:
     "lineColor": "#00C853"
   }
 }
+```
 
 MERMAID SCRIPT:
+```
 flowchart TD
     DAILY["Daily trigger\n8am"] --> SORT["runInboxSorting()"]
     TENDAY["Daily trigger 7am\nfires every 10 days"] --> GATEWAY["dustbusterMasterGateway()"]
@@ -84,3 +87,4 @@ flowchart TD
     class EXC,DRULE,NRULE,AUTO,PURGECHK,OUTCHK,WAKECHK,HIBQ decision
     class HUMAN1,HUMAN2,MANUAL,ORGCAND human
     class GATEWAY,HIBCHECK terminal
+```
