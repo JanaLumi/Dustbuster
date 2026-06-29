@@ -276,13 +276,14 @@ function drawLens() {
   lens.style.left = (mouseX - HALF) + 'px';
   lens.style.top  = (mouseY - HALF) + 'px';
 
-  const srcX    = (mouseX - (iRect.left - wRect.left)) - HALF / scale;
-  const srcY    = (mouseY - (iRect.top  - wRect.top))  - HALF / scale;
+  const srcX = mouseX - (iRect.left - wRect.left) - HALF / scale;
+  const srcY = mouseY - (iRect.top  - wRect.top)  - HALF / scale;
   const srcW    = LSIZE / scale;
   const srcH    = LSIZE / scale;
 
   const scaleX  = svgImg._w / iRect.width;
   const scaleY  = svgImg._h / iRect.height;
+  console.log(svgImg._w, svgImg._h, iRect.width, iRect.height);
 
   ctx.clearRect(0, 0, LSIZE, LSIZE);
 
