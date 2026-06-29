@@ -257,8 +257,8 @@ function buildSvgImage(cb) {
 
   img.onload = function() {
     svgImg = img;
-    svgImg._w = svgWidth+100;
-    svgImg._h = svgHeight+100;
+    svgImg._w = svgWidth;
+    svgImg._h = svgHeight;
     URL.revokeObjectURL(url);
     if (cb) cb();
   };
