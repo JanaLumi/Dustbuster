@@ -1,59 +1,86 @@
+You can use this [live editor](https://mermaid.ai/live/) to display the diagram. Copy-Paste the content below in the appropriate fields.
+
+CONFIG:
+{
+  "theme": "forest",
+  "look": "neo",
+  "fontFamily": "'Inter Variable', sans-serif",
+  "darkMode": "true",
+  "layout": "fixed",
+  "showgrid": "false",
+  "themeVariables": {
+    "lineColor": "#00C853"
+  }
+}
+
+MERMAID SCRIPT:
 flowchart TD
-    subgraph triggers["Triggers (time-based)"]
-        T1["Every 15 min"]
-        T2["Every 1 hour"]
-        T3["Sunday 6pm"]
-    end
+    DAILY["Daily trigger\n8am"] --> SORT["runInboxSorting()"]
+    TENDAY["Daily trigger 7am\nfires every 10 days"] --> GATEWAY["dustbusterMasterGateway()"]
+    MONTHLY["Monthly trigger\n2nd at 2am"] --> HIBCHECK["runHibernationCheck()"]
 
-    T1 --> INBOX_START["processInbox()"]
-    T2 --> OUT_START["processOutreach()"]
-    T3 --> REPORT_START["writeWeeklyReport()"]
+    SORT --> EXC{"Matches\nException?"}
+    EXC -->|"Yes"| SKIP["Skip — leave untouched"]
+    EXC -->|"No"| DRULE{"Matches\nDumpster-Fire rule?"}
+    DRULE -->|"Yes"| DUMP["Label 03-Dumpster-Fire\nArchive"]
+    DRULE -->|"No"| NRULE{"Matches\nNoise rule?"}
+    NRULE -->|"Yes"| NOISE["Label Noise\nArchive"]
+    NRULE -->|"No"| AUTO{"Matches\nLayer-1 pattern?"}
+    AUTO -->|"Yes"| DUMP
+    AUTO -->|"No"| INBOX["Stays in inbox\nunlabeled"]
 
-    %% --- INBOX SORTING FLOW ---
-    INBOX_START --> SEARCH["Search unread inbox\nmax 50 threads"]
-    SEARCH --> LOOP1{"For each thread"}
-    LOOP1 --> READ["Read sender, subject,\nbody (first 1000 chars)"]
-    READ --> RULECHECK{"Matches any\nINBOX_RULE?"}
-    RULECHECK -->|"Yes"| APPLYLABEL["Apply label(s)\nWorksearch/category"]
-    RULECHECK -->|"No"| LOOP1
-    APPLYLABEL --> LOOP1
-    LOOP1 -->|"Done"| INBOX_END(["Inbox pass complete"])
+    GATEWAY --> G1["1. Archive sweep"]
+    G1 --> G2["2. Rescue scan"]
+    G2 --> G3["3. Purge old Dumpster-Fire"]
+    G3 --> G4["4. Learning algorithm"]
+    G4 --> G5["5. Outreach check"]
+    G5 --> G6["6. Wake-on-reply check"]
+    G6 --> G7["7. Write 10-day summary"]
+    G7 --> G8["8. Schedule reminder"]
+    G8 --> G9["9. Update status panel"]
 
-    %% --- OUTREACH TRACKING FLOW ---
-    OUT_START --> GETWAITING["Get all threads\nlabeled Outreach/Waiting"]
-    GETWAITING --> LOOP2{"For each thread"}
-    LOOP2 --> CHECKREPLY{"More than 1\nmessage in thread?"}
-    CHECKREPLY -->|"Yes, replied"| MOVEREPLIED["Remove Waiting + Follow-Up-Due\nAdd Outreach/Replied"]
-    MOVEREPLIED --> LOGSHEET["logReplyReceived()\nwrite/update row in\nOutreach Log tab"]
-    LOGSHEET --> LOOP2
+    G1 --> SWEEP1["01-Review-Pending\nover 30 days → 03"]
+    G1 --> SWEEP2["02 or 03 in inbox\nover 30 days → archive"]
+    G1 --> SWEEP3["Transient exception\nover 45 days → 01"]
+    G1 --> SWEEP4["Permanent exception\nover 10 years → 01"]
 
-    CHECKREPLY -->|"No reply yet"| GETTIER{"Which tier label?\nHot / Warm / Cold"}
-    GETTIER --> DEADLINE{"Days since sent\n>= tier deadline?"}
-    DEADLINE -->|"Yes, overdue"| FLAGOVERDUE["Add Outreach/Follow-Up-Due\nStar the message"]
-    FLAGOVERDUE --> LOOP2
-    DEADLINE -->|"No, still waiting"| LOOP2
-    LOOP2 -->|"Done"| OUT_END(["Outreach pass complete"])
+    G3 --> PURGECHK{"03-Dumpster-Fire\nover 75 days?"}
+    PURGECHK -->|"Yes"| TRASH["Move to Trash\nGmail auto-deletes day 105"]
 
-    %% --- WEEKLY REPORT FLOW ---
-    REPORT_START --> COUNTLABELS["Count threads per label:\nWaiting, Replied, Follow-Up-Due,\nHot, Warm, Cold,\nApplications, Interviews,\nRejections, Recruiter-Outreach"]
-    COUNTLABELS --> CALCRATE["Calculate response rate\nreplied / total sent"]
-    CALCRATE --> WRITEROW["Append row to\nWeekly Summary tab"]
-    WRITEROW --> REPORT_END(["Report written"])
+    G4 --> LEARN["Scan 03-Dumpster-Fire\nfind repeat senders"]
+    LEARN --> SUGGEST["Write to\nSuggested-Rules tab"]
+    SUGGEST -.->|"you review,\nmark YES"| PROMOTE["promoteApprovedRules()"]
+    PROMOTE --> DRULE
 
-    %% --- MANUAL HUMAN STEPS ---
-    HUMAN1(["You: send outreach email"]) -.->|"manually apply"| MANUALLABEL["Outreach/Waiting +\nOutreach/Hot or Warm or Cold"]
-    MANUALLABEL -.-> GETWAITING
+    G5 --> OUTCHK{"Outreach/Waiting\nthread has reply?"}
+    OUTCHK -->|"Yes"| REPLIED["Label Replied\nLog to sheet"]
+    OUTCHK -->|"No, over 10 days"| OVERDUE["Label Follow-Up-Due\nStar thread"]
+    OUTCHK -->|"No, still waiting"| WAIT["Stays Waiting"]
 
-    HUMAN2(["You: review weekly sheet"]) -.-> WRITEROW
+    G6 --> WAKECHK{"Hibernated thread\nhas new reply?"}
+    WAKECHK -->|"Yes"| WAKE["Move back to\nactive label"]
+
+    HIBCHECK --> HIBQ{"Projects/Groups/Orgs\nlabel inactive 9+ months?"}
+    HIBQ -->|"Yes"| HIB["Rename to x-prefix\nhibernated"]
+
+    HUMAN1(["You: send email"]) -.->|"apply manually"| MANUAL["Outreach/Waiting"]
+    MANUAL -.-> OUTCHK
+
+    HUMAN2(["You: review tabs"]) -.-> SUGGEST
+    HUMAN2 -.-> ORGCAND["Org-Candidates tab"]
+
+    DISCOVERY["runOrgDiscovery()\nrun manually"] --> ORGCAND
+    ORGCAND -.->|"you approve"| PROMOTEORG["promoteOrgCandidates()"]
+    PROMOTEORG --> ORGLABEL["Create Orgs/ label\napply retroactively"]
 
     classDef trigger fill:#FAEEDA,stroke:#854F0B,color:#412402
     classDef process fill:#E1F5EE,stroke:#0F6E56,color:#04342C
     classDef decision fill:#EEEDFE,stroke:#534AB7,color:#26215C
     classDef human fill:#FAECE7,stroke:#993C1D,color:#4A1B0C
-    classDef endpoint fill:#F1EFE8,stroke:#5F5E5A,color:#2C2C2A
+    classDef terminal fill:#F1EFE8,stroke:#5F5E5A,color:#2C2C2A
 
-    class T1,T2,T3 trigger
-    class INBOX_START,SEARCH,READ,APPLYLABEL,GETWAITING,MOVEREPLIED,LOGSHEET,FLAGOVERDUE,COUNTLABELS,CALCRATE,WRITEROW process
-    class LOOP1,LOOP2,RULECHECK,CHECKREPLY,GETTIER,DEADLINE decision
-    class HUMAN1,HUMAN2,MANUALLABEL human
-    class INBOX_END,OUT_END,REPORT_END endpoint
+    class DAILY,TENDAY,MONTHLY trigger
+    class SORT,DUMP,NOISE,INBOX,G1,G2,G3,G4,G5,G6,G7,G8,G9,SWEEP1,SWEEP2,SWEEP3,SWEEP4,TRASH,LEARN,SUGGEST,PROMOTE,REPLIED,OVERDUE,WAIT,WAKE,HIB,DISCOVERY,PROMOTEORG,ORGLABEL,SKIP process
+    class EXC,DRULE,NRULE,AUTO,PURGECHK,OUTCHK,WAKECHK,HIBQ decision
+    class HUMAN1,HUMAN2,MANUAL,ORGCAND human
+    class GATEWAY,HIBCHECK terminal
