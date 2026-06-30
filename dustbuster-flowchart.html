@@ -276,8 +276,8 @@ function drawLens() {
   lens.style.left = lx + 'px';
   lens.style.top  = ly + 'px';
 
-  const srcX = mouseX - (iRect.left - wRect.left) - HALF / scale;
-  const srcY = mouseY - (iRect.top  - wRect.top)  - HALF / scale;
+  const srcX = (mouseX - (iRect.left - wRect.left)) - HALF / scale;
+  const srcY = (mouseY - (iRect.top  - wRect.top))  - HALF / scale;
   const srcW    = LSIZE / scale;
   const srcH    = LSIZE / scale;
 
