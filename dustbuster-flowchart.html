@@ -5,19 +5,36 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dustbuster — system diagram</title>
 <style>
+
+  @font-face {
+    font-family: "Merriweather";
+    src: url("https://janalumi.github.io/fonts/Merriweather-Regular.ttf") format("truetype");
+  /*  font-weight: normal;
+    font-style: normal; */
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "DM Mono";
+    src: url("https://janalumi.github.io/fonts/DMMono-Regular.ttf") format("truetype");
+  /*  font-weight: normal;
+    font-style: normal; */
+    font-display: swap;
+  }
+ 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: #f8f7f4;
+    font-family: Merriweather, Georgia, serif;
+    background: #d9edd9;
     color: #2c2c2a;
     min-height: 100vh;
     padding: 2rem;
   }
 
   header { margin-bottom: 1.25rem; }
-  header h1 { font-size: 1.2rem; font-weight: 500; color: #2c2c2a; }
-  header p { font-size: 0.78rem; color: #888780; margin-top: 0.2rem; }
+  header h1 { font-family: Merriweather, Georgia, serif; font-size: 1.2rem; font-weight: 500; color: #2c2c2a; }
+  header p { font-family: "DM Mono", Courier, monospace, sans-serif; font-size: 0.78rem; color: #888780; margin-top: 0.2rem; }
 
   .legend {
     display: flex;
@@ -85,7 +102,7 @@
     border-radius: 50%;
     pointer-events: none;
     z-index: 5;
-    border: 2.5px solid #534AB7;
+    border: 2.5px solid #7e5d3f;
   }
 
   #zoom-badge {
@@ -121,11 +138,11 @@
 </header>
 
 <div class="legend">
-  <div class="legend-item"><div class="legend-dot" style="background:#EF9F27"></div>Triggers</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div>Automated processes</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#7F77DD"></div>Decisions</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>Your manual steps</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#888780"></div>Start / end</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#EF9F27"></div>⏩Triggers</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div>🔁Automated processes</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#7F77DD"></div>🎛️Decisions</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>🎚️Your manual steps</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#888780"></div>⏯️Start / end</div>
 </div>
 
 <div id="diagram-wrap">
