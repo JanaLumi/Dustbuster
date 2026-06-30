@@ -229,7 +229,7 @@ const LSIZE    = 220;
 const HALF     = LSIZE / 2;
 const MIN_Z    = 1.5;
 const MAX_Z    = 8;
-const SVG_PAD  = 120; // Ample breathing room to prevent cutting off elements near borders
+const SVG_PAD  = 150; // Plentiful padding so nothing clips at the borders
 
 let scale     = 3;
 let mouseX    = 0;
@@ -243,17 +243,24 @@ function buildSvgImage(cb) {
   const svg = inner.querySelector('svg');
   if (!svg) { setTimeout(() => buildSvgImage(cb), 200); return; }
 
-  const clone     = svg.cloneNode(true);
-  const svgWidth  = svg.getBoundingClientRect().width  || svg.viewBox.baseVal.width  || 800;
-  const svgHeight = svg.getBoundingClientRect().height || svg.viewBox.baseVal.height || 600;
+  // Use the native viewBox dimensions to establish the absolute internal coordinates
+  const viewBox = svg.viewBox.baseVal;
+  const svgWidth  = viewBox.width  || svg.getBoundingClientRect().width  || 800;
+  const svgHeight = viewBox.height || svg.getBoundingClientRect().height || 600;
 
+  const clone = svg.cloneNode(true);
+  
+  // Strip explicit styles that might interfere with custom sizing inside the image matrix
+  clone.removeAttribute('style');
+  
   const totalWidth  = svgWidth + (SVG_PAD * 2);
   const totalHeight = svgHeight + (SVG_PAD * 2);
 
   clone.setAttribute('width',  totalWidth);
   clone.setAttribute('height', totalHeight);
-  clone.style.padding = `${SVG_PAD}px`; 
-  clone.style.boxSizing = 'border-box';
+  
+  // Shift the viewport window to perfectly accommodate the padding injection
+  clone.setAttribute('viewBox', `${viewBox.x - SVG_PAD} ${viewBox.y - SVG_PAD} ${totalWidth} ${totalHeight}`);
 
   const xml  = new XMLSerializer().serializeToString(clone);
   const blob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
@@ -262,12 +269,8 @@ function buildSvgImage(cb) {
 
   img.onload = function() {
     svgImg = img;
-    // Track both the inner content size AND the outer canvas wrapper size
     svgImg._w = svgWidth;
     svgImg._h = svgHeight;
-    svgImg._canvasW = totalWidth;
-    svgImg._canvasH = totalHeight;
-    
     URL.revokeObjectURL(url);
     if (cb) cb();
   };
@@ -277,25 +280,27 @@ function buildSvgImage(cb) {
 function drawLens() {
   if (!svgImg || !inside) return;
 
-  const wRect   = wrap.getBoundingClientRect();
-  const iRect   = inner.getBoundingClientRect();
+  const svg = inner.querySelector('svg');
+  if (!svg) return;
 
-  // Anchor physical lens position to cursor
+  const wRect = wrap.getBoundingClientRect();
+  const sRect = svg.getBoundingClientRect(); // Map to the SVG itself, ignoring parent container dead space
+
+  // Position physical lens over the cursor
   const lx      = mouseX - HALF;
   const ly      = mouseY - HALF;
   lens.style.left = lx + 'px';
   lens.style.top  = ly + 'px';
 
-  // Scale map must be relative to the inner diagram element size
-  const scaleX  = svgImg._w / iRect.width;
-  const scaleY  = svgImg._h / iRect.height;
+  // Calculate the ratio between the internal SVG coordinates and the actual rendered pixel width on screen
+  const scaleX  = svgImg._w / sRect.width;
+  const scaleY  = svgImg._h / sRect.height;
 
-  // Track absolute position inside inner bounding layout
-  const relativeX = mouseX - (iRect.left - wRect.left);
-  const relativeY = mouseY - (iRect.top  - wRect.top);
+  // Track cursor coordinates relative directly to the SVG bounds
+  const relativeX = mouseX - (sRect.left - wRect.left);
+  const relativeY = mouseY - (sRect.top  - wRect.top);
 
-  // The crucial fix: find the base asset coordinate, add the padding offset,
-  // and subtract the viewport zoom window.
+  // Map position natively and center the viewport
   const srcX = (relativeX * scaleX) + SVG_PAD - (HALF / scale);
   const srcY = (relativeY * scaleY) + SVG_PAD - (HALF / scale);
 
@@ -309,7 +314,6 @@ function drawLens() {
   ctx.arc(HALF, HALF, HALF, 0, Math.PI * 2);
   ctx.clip();
 
-  // Draw from the properly calibrated image stream
   ctx.drawImage(
     svgImg,
     srcX, srcY,
@@ -317,8 +321,8 @@ function drawLens() {
     0, 0, LSIZE, LSIZE
   );
 
-  // Precision Crosshairs
-  ctx.strokeStyle = 'rgba(175,169,236,0.25)';
+  // Crosshairs
+  ctx.strokeStyle = 'rgba(175,169,236,0.35)';
   ctx.lineWidth = 0.5;
   ctx.beginPath(); ctx.moveTo(HALF, 0); ctx.lineTo(HALF, LSIZE); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(0, HALF); ctx.lineTo(LSIZE, HALF); ctx.stroke();
