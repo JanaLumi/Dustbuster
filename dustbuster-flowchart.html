@@ -372,7 +372,27 @@ wrap.addEventListener('mousemove', function(e) {
   mouseY  = e.clientY - r.top;
 });
 
+/*
 wrap.addEventListener('wheel', function(e) {
+  e.preventDefault();
+  const delta = e.deltaY > 0 ? -0.25 : 0.25;
+  scale = Math.min(MAX_Z, Math.max(MIN_Z, scale + delta));
+
+  badge.textContent = scale.toFixed(1) + '×';
+  badge.style.display = 'block';
+  clearTimeout(badgeTimeout);
+  badgeTimeout = setTimeout(() => { badge.style.display = 'none'; }, 1200);
+}, { passive: false });
+*/
+  
+wrap.addEventListener('wheel', function(e) {
+  // If ANY mouse button is held down (e.buttons > 0), 
+  // do not zoom. Let the default page scrolling happen instead.
+  if (e.buttons > 0) {
+    return; 
+  }
+
+  // Otherwise, run your magnifier zoom logic
   e.preventDefault();
   const delta = e.deltaY > 0 ? -0.25 : 0.25;
   scale = Math.min(MAX_Z, Math.max(MIN_Z, scale + delta));
