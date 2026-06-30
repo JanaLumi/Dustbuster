@@ -46,7 +46,7 @@
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    font-size: 0.75rem;
+    font-size: 0.80rem;
     color: #5f5e5a;
   }
   .legend-dot {
@@ -226,7 +226,7 @@ flowchart TD
     <canvas id="lens-canvas" width="220" height="220"></canvas>
     <div id="lens-rim"></div>
   </div>
-  <div id="zoom-badge">3×</div>
+  <div id="zoom-badge">2×</div>
 </div>
 
 <p id="hint">Hover to magnify &nbsp;·&nbsp; scroll wheel to adjust zoom &nbsp;·&nbsp; works best in a browser</p>
@@ -248,7 +248,7 @@ const MIN_Z    = 1; // lens zoom minimum
 const MAX_Z    = 8; // lens zoom maximum
 const SVG_PAD  = 150; // Plentiful padding so nothing clips at the borders
 
-let scale     = 3;
+let scale     = 2;
 let mouseX    = 0;
 let mouseY    = 0;
 let rafId     = null;
