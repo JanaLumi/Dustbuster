@@ -271,19 +271,28 @@ function drawLens() {
   const wRect   = wrap.getBoundingClientRect();
   const iRect   = inner.getBoundingClientRect();
 
+// Position the physical lens elements over the cursor
   const lx      = mouseX - HALF;
   const ly      = mouseY - HALF;
   lens.style.left = lx + 'px';
   lens.style.top  = ly + 'px';
 
-  const srcX = (mouseX - (iRect.left - wRect.left)) - HALF / scale;
-  const srcY = (mouseY - (iRect.top  - wRect.top))  - HALF / scale;
-  const srcW    = LSIZE / scale;
-  const srcH    = LSIZE / scale;
-
+  // Scale differences between the rendered HTML layout and the original SVG dimensions
   const scaleX  = svgImg._w / iRect.width;
   const scaleY  = svgImg._h / iRect.height;
-  console.log(svgImg._w, svgImg._h, iRect.width, iRect.height);
+
+  // 1. Calculate cursor position relative to the inner diagram element
+  const relativeX = mouseX - (iRect.left - wRect.left);
+  const relativeY = mouseY - (iRect.top  - wRect.top);
+
+  // 2. Convert layout coordinates to original image coordinates, 
+  // then shift left/up by half the lens's viewport size, 
+  // and finally add the 50px padding offset applied during cloning.
+  const srcX = (relativeX * scaleX) - (HALF / scale) + 50;
+  const srcY = (relativeY * scaleY) - (HALF / scale) + 50;
+
+  const srcW = LSIZE / scale;
+  const srcH = LSIZE / scale;
 
   ctx.clearRect(0, 0, LSIZE, LSIZE);
 
@@ -292,10 +301,11 @@ function drawLens() {
   ctx.arc(HALF, HALF, HALF, 0, Math.PI * 2);
   ctx.clip();
 
+  // Draw using the properly padded coordinates
   ctx.drawImage(
     svgImg,
-    srcX * scaleX, srcY * scaleY,
-    srcW * scaleX, srcH * scaleY,
+    srcX, srcY,
+    srcW, srcH,
     0, 0, LSIZE, LSIZE
   );
 
