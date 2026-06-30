@@ -225,10 +225,11 @@ const canvas  = document.getElementById('lens-canvas');
 const ctx     = canvas.getContext('2d');
 const badge   = document.getElementById('zoom-badge');
 
-const LSIZE   = 220;
-const HALF    = LSIZE / 2;
-const MIN_Z   = 1.5;
-const MAX_Z   = 8;
+const LSIZE    = 220;
+const HALF     = LSIZE / 2;
+const MIN_Z    = 1.5;
+const MAX_Z    = 8;
+const SVG_PAD  = 120; // Ample breathing room to prevent cutting off elements near borders
 
 let scale     = 3;
 let mouseX    = 0;
@@ -246,9 +247,13 @@ function buildSvgImage(cb) {
   const svgWidth  = svg.getBoundingClientRect().width  || svg.viewBox.baseVal.width  || 800;
   const svgHeight = svg.getBoundingClientRect().height || svg.viewBox.baseVal.height || 600;
 
-  clone.setAttribute('width',  svgWidth  + 100);
-  clone.setAttribute('height', svgHeight + 100);
-  clone.style.padding = '50px'; // you might not need this
+  const totalWidth  = svgWidth + (SVG_PAD * 2);
+  const totalHeight = svgHeight + (SVG_PAD * 2);
+
+  clone.setAttribute('width',  totalWidth);
+  clone.setAttribute('height', totalHeight);
+  clone.style.padding = `${SVG_PAD}px`; 
+  clone.style.boxSizing = 'border-box';
 
   const xml  = new XMLSerializer().serializeToString(clone);
   const blob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
@@ -257,8 +262,12 @@ function buildSvgImage(cb) {
 
   img.onload = function() {
     svgImg = img;
+    // Track both the inner content size AND the outer canvas wrapper size
     svgImg._w = svgWidth;
     svgImg._h = svgHeight;
+    svgImg._canvasW = totalWidth;
+    svgImg._canvasH = totalHeight;
+    
     URL.revokeObjectURL(url);
     if (cb) cb();
   };
@@ -271,25 +280,24 @@ function drawLens() {
   const wRect   = wrap.getBoundingClientRect();
   const iRect   = inner.getBoundingClientRect();
 
-// Position the physical lens elements over the cursor
+  // Anchor physical lens position to cursor
   const lx      = mouseX - HALF;
   const ly      = mouseY - HALF;
   lens.style.left = lx + 'px';
   lens.style.top  = ly + 'px';
 
-  // Scale differences between the rendered HTML layout and the original SVG dimensions
+  // Scale map must be relative to the inner diagram element size
   const scaleX  = svgImg._w / iRect.width;
   const scaleY  = svgImg._h / iRect.height;
 
-  // 1. Calculate cursor position relative to the inner diagram element
+  // Track absolute position inside inner bounding layout
   const relativeX = mouseX - (iRect.left - wRect.left);
   const relativeY = mouseY - (iRect.top  - wRect.top);
 
-  // 2. Convert layout coordinates to original image coordinates, 
-  // then shift left/up by half the lens's viewport size, 
-  // and finally add the 50px padding offset applied during cloning.
-  const srcX = (relativeX * scaleX) - (HALF / scale) + 50;
-  const srcY = (relativeY * scaleY) - (HALF / scale) + 50;
+  // The crucial fix: find the base asset coordinate, add the padding offset,
+  // and subtract the viewport zoom window.
+  const srcX = (relativeX * scaleX) + SVG_PAD - (HALF / scale);
+  const srcY = (relativeY * scaleY) + SVG_PAD - (HALF / scale);
 
   const srcW = LSIZE / scale;
   const srcH = LSIZE / scale;
@@ -301,7 +309,7 @@ function drawLens() {
   ctx.arc(HALF, HALF, HALF, 0, Math.PI * 2);
   ctx.clip();
 
-  // Draw using the properly padded coordinates
+  // Draw from the properly calibrated image stream
   ctx.drawImage(
     svgImg,
     srcX, srcY,
@@ -309,6 +317,7 @@ function drawLens() {
     0, 0, LSIZE, LSIZE
   );
 
+  // Precision Crosshairs
   ctx.strokeStyle = 'rgba(175,169,236,0.25)';
   ctx.lineWidth = 0.5;
   ctx.beginPath(); ctx.moveTo(HALF, 0); ctx.lineTo(HALF, LSIZE); ctx.stroke();
