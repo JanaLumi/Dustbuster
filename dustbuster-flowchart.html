@@ -271,10 +271,10 @@ function drawLens() {
   const wRect   = wrap.getBoundingClientRect();
   const iRect   = inner.getBoundingClientRect();
 
-  const lx      = mouseX - HALF;
-  const ly      = mouseY - HALF;
-  lens.style.left = (mouseX - HALF) + 'px';
-  lens.style.top  = (mouseY - HALF) + 'px';
+  const lx      = mouseX + HALF;
+  const ly      = mouseY + HALF;
+  lens.style.left = lx + 'px';
+  lens.style.top  = ly + 'px';
 
   const srcX = mouseX - (iRect.left - wRect.left) - HALF / scale;
   const srcY = mouseY - (iRect.top  - wRect.top)  - HALF / scale;
