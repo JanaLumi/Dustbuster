@@ -6,4 +6,4 @@ Gmail cleanup scripts...and maybe a dustbusting game with [bunnies and dogs](htt
 Dustbuster config link to copy to your google drive: [Googlesheets link](https://docs.google.com/spreadsheets/d/1rM0aczM7yY4RvKJBaGwkP8N5k82d-9Gl5-mSryMbB7g/edit?usp=drive_link)
 
 <a href="https://janalumi.github.io/Dustbuster/dustbuster-flowchart.html"><img src="Resources/Dustbuster-preview.png" alt="image describing the architecture" width="300"/></a>
-<a href="https://janalumi.github.io/Dustbuster/dustbuster-flowchart.html">OPEN Dusbuster flowchart viewer</a>
+<a href="https://janalumi.github.io/Dustbuster/dustbuster-flowchart.html">OPEN Dusbuster flowchart viewer</a> — use desktop view on mobile.
