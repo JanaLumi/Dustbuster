@@ -366,7 +366,7 @@ const perspectives = {
            <p>Running alongside all of this is an org discovery process you trigger manually when you want it. Dustbuster scans your sent mail and your inbox together, looking for domains and contacts that appear repeatedly in both directions — real relationships, not just newsletters. It surfaces these as candidates. You review them, approve the ones that matter, and the system creates a dedicated label for each one and applies it retroactively to all matching threads.</p>
            <p>Your own role in the system is small but decisive. You send emails and apply a waiting label. You review suggestions and approve or reject them. You run org discovery when the moment feels right. Everything else runs without you — quietly, on a rhythm, getting slightly smarter each cycle.</p>`,
     code: `flowchart TD
-      %%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#EEEDFE', 'primaryBorderColor': '#534AB7', 'primaryTextColor': '#26215C', 'lineColor': '#888780', 'secondaryColor': '#E1F5EE', 'tertiaryColor': '#FAEEDA', 'fontSize': '15px'}}}%%
+      %%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#EEEDFE', 'primaryBorderColor': '#534AB7', 'primaryTextColor': '#26215C', 'lineColor': '#888780', 'secondaryColor': '#E1F5EE', 'tertiaryColor': '#FAEEDA', 'fontSize': '16px'}}}%%
       DAILY["Daily trigger\n8am"] --> SORT["runInboxSorting()"]
       TENDAY["Daily trigger 7am\nfires every 10 days"] --> GATEWAY["dustbusterMasterGateway()"]
       MONTHLY["Monthly trigger\n2nd at 2am"] --> HIBCHECK["runHibernationCheck()"]
@@ -442,7 +442,7 @@ const perspectives = {
     text: `<p>...</p>
            <p>...</p>`,
     code: `flowchart TD
-      %%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#EEEDFE', 'primaryBorderColor': '#534AB7', 'primaryTextColor': '#26215C', 'lineColor': '#888780', 'secondaryColor': '#E1F5EE', 'fontSize': '13px'}}}%%
+      %%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#EEEDFE', 'primaryBorderColor': '#534AB7', 'primaryTextColor': '#26215C', 'lineColor': '#888780', 'secondaryColor': '#E1F5EE', 'fontSize': '16px'}}}%%
       
       ...`
   }
