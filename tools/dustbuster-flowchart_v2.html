@@ -411,7 +411,7 @@
 // Metadata config for descriptions and file pathways
 const perspectives = {
   journey: {
-    title: "System Journey — Tracing the Data Flow",
+    title: "System Journey — The Story of the System",
     file: "../diagrams/system-journey.md",
     text: `<p>This perspective traces the active lifecycle of a process as it travels through the environment, beginning with raw material configurations or primary inputs.</p>
            <p>It illuminates how these states transform as they pass through various operational zones, establishing a transparent, step-by-step narrative of the system's internal current.</p>`
@@ -474,56 +474,66 @@ async function switchPerspective(key, evt) {
   const view = perspectives[key];
   if (!view) return;
 
-  // Track state change to keep audio engine perfectly aligned
   currentPerspective = key;
 
-  // Halt any active text-to-speech stream when views pivot
   if (synth && synth.speaking) {
     stopAudio();
   }
 
-  // Update accompanying text details via your preferred identifiers
+  // 1. Immediately render local default properties so first-time users see text right away
   document.getElementById("perspective-title").innerText = view.title;
   document.getElementById("perspective-text").innerHTML = view.text;
 
   try {
-    // Read the standalone plain .md text file
     const response = await fetch(view.file);
-    let code = await response.text();
+    if (!response.ok) throw new Error("File not found");
+    
+    const wholeFileText = await response.text();
 
-    // Clean out typical markdown code fences if editing left them behind
-    code = code.replace(/```mermaid/g, "").replace(/```/g, "").trim();
+    // 2. Locate and extract the properties dynamically from the file
+    const titleStart = wholeFileText.indexOf('title: "') + 8;
+    const titleEnd = wholeFileText.indexOf('",', titleStart);
+    const parsedTitle = wholeFileText.substring(titleStart, titleEnd).trim();
 
-    // Re-inject container code block for Mermaid's layout scanner
+    const textStart = wholeFileText.indexOf('text: `') + 7;
+    const textEnd = wholeFileText.indexOf('`,', textStart);
+    const parsedText = wholeFileText.substring(textStart, textEnd).trim();
+
+    const codeStart = wholeFileText.indexOf('code: `') + 7;
+    let codeEnd = wholeFileText.lastIndexOf('`');
+    if (codeEnd <= codeStart) codeEnd = wholeFileText.length;
+    const parsedCode = wholeFileText.substring(codeStart, codeEnd).trim();
+
+    // 3. Override with parsed properties if the file is valid
+    document.getElementById("perspective-title").innerText = parsedTitle;
+    document.getElementById("perspective-text").innerHTML = parsedText;
+
     const outputTarget = document.getElementById("mermaid-target");
     outputTarget.removeAttribute("data-processed");
-    outputTarget.textContent = code;
+    outputTarget.textContent = parsedCode;
 
-    // Trigger local Mermaid layout rebuild
-    mermaid.run({ nodes: [outputTarget] });
-
-    // Manage active button visual highlights safely
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    
-    // Fallback block if invocation occurs on load without interaction events
-    if (evt && evt.currentTarget) {
-      evt.currentTarget.classList.add('active');
-    } else {
-      // Automatic fallback selection matching on application initialization states
-      const targetText = key === 'journey' ? 'SYSTEM JOURNEY' : 'SYSTEM OVERVIEW';
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        if (btn.textContent.trim() === targetText) btn.classList.add('active');
-      });
-    }
-
-    // Force magnification lens recalculations to update image caches smoothly
-    setTimeout(buildSvgImage, 350);
+    await mermaid.run({ nodes: [outputTarget], suppressErrors: true });
 
   } catch (error) {
-    console.error("Could not fetch the decoupled diagram file:", error);
-    document.getElementById("mermaid-target").textContent = "Error reading perspective database file.";
+    console.warn("Using local defaults. Could not parse external markdown file:", error.message);
+    // Leave the default text in place, but show a friendly warning where the diagram goes
+    document.getElementById("mermaid-target").textContent = "First-time setup: Add your markdown files to diagrams/ to render the flowchart infrastructure.";
   }
+
+  // Manage tab button states
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  if (evt && evt.currentTarget) {
+    evt.currentTarget.classList.add('active');
+  } else {
+    const targetText = key === 'journey' ? 'SYSTEM JOURNEY' : 'SYSTEM OVERVIEW';
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      if (btn.textContent.trim() === targetText) btn.classList.add('active');
+    });
+  }
+
+  setTimeout(buildSvgImage, 350);
 }
+
 // COMPUTE INITIAL OR MID-SENTENCE UTTERANCE
 function playSpeechFromOffset(textToSpeak, characterOffset = 0) {
   if (synth) {
